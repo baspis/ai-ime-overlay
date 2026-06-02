@@ -46,7 +46,9 @@ struct AIIMEOverlayApp: App {
             }
             .disabled(coordinator.appState.isPanelVisible)
 
-            SettingsLink("Settings…")
+            Button("Settings…") {
+                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+            }
 
             Divider()
 

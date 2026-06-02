@@ -17,7 +17,14 @@ Pre-built macOS builds are published on [GitHub Releases](https://github.com/bas
 
 5. Grant **Accessibility** and **Input Monitoring** when prompted.
 
-To cut a new release, push a version tag (CI builds and uploads the zip automatically):
+Before tagging, confirm the release build on your Mac (same command as CI):
+
+```bash
+chmod +x scripts/build-release.sh
+./scripts/build-release.sh
+```
+
+Then push a version tag (CI builds and uploads the zip automatically):
 
 ```bash
 git tag v1.0.0
@@ -41,9 +48,8 @@ You can also run the **Release** workflow manually from the Actions tab; the zip
    git clone https://github.com/baspis/ai-ime-overlay.git
    cd ai-ime-overlay
    ```
-2. Open `AIIMEOverlay.xcodeproj` in Xcode.
-3. Set your **Development Team** under Signing & Capabilities.
-4. Build and run (`⌘R`).
+2. Run `./scripts/build-release.sh` to verify a Release build, or open `AIIMEOverlay.xcodeproj` in Xcode and build (`⌘R`).
+3. For Xcode GUI builds, set your **Development Team** under Signing & Capabilities.
 
 The app runs as a menu bar agent (no Dock icon).
 

@@ -13,15 +13,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "16.4"
+
       - name: Build
+        id: build
         run: |
           set -euo pipefail
-          xcodebuild \
-            -project AIIMEOverlay.xcodeproj \
-            -scheme AIIMEOverlay \
-            -configuration Release \
-            -destination "platform=macOS" \
-            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="-" \
-            DEVELOPMENT_TEAM=""
+          export DERIVED_DATA="$RUNNER_TEMP/DerivedData"
+          ./scripts/build-release.sh 2>&1 | tee "$RUNNER_TEMP/xcodebuild.log"
+
+      - name: Report compile errors on failure
+        if: failure()
+        run: |
+          echo "::group::Compile errors"
+          grep -E " error:" "$RUNNER_TEMP/xcodebuild.log" || echo "(no 'error:' lines in log)"
+          echo "::endgroup::"
