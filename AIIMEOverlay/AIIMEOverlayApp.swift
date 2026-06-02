@@ -46,11 +46,7 @@ struct AIIMEOverlayApp: App {
             }
             .disabled(coordinator.appState.isPanelVisible)
 
-            SettingsLink {
-                Text("Settings…")
-            } label: {
-                Text("Settings…")
-            }
+            SettingsLink("Settings…")
 
             Divider()
 
