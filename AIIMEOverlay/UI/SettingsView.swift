@@ -12,12 +12,12 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section {
-                Text("Romaji you type is sent to OpenAI for conversion. Do not enter secrets.")
+                Text("Romaji is sent to Google Gemini for conversion. Get a free API key at aistudio.google.com/apikey")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
-            Section("OpenAI") {
+            Section("Gemini") {
                 SecureField("API Key", text: $apiKeyDraft)
                     .textFieldStyle(.roundedBorder)
 
@@ -29,6 +29,10 @@ struct SettingsView: View {
 
                 TextField("Model", text: $modelDraft)
                     .textFieldStyle(.roundedBorder)
+
+                Text("Default: \(AppSettings.defaultModelName) (fastest/cheapest). Upgrade: \(AppSettings.recommendedUpgradeModelName)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
                 HStack {
                     Button("Save") { saveSettings() }

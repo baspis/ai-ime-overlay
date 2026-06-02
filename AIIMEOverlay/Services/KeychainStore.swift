@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 enum KeychainStore {
-    private static let service = "com.aiimeoverlay.openai"
+    private static let service = "com.aiimeoverlay.gemini"
     private static let account = "api-key"
 
     static func readAPIKey() -> String? {

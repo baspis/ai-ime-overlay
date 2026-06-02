@@ -55,7 +55,7 @@ The app runs as a menu bar agent (no Dock icon).
 
 ## First-time setup
 
-1. Click the **AI IME** menu bar icon → **Settings**.
+1. Click the **AI IME** menu bar icon → **Settings…** (opens the settings window).
 2. Enter your OpenAI API key (stored in Keychain) and model name (default: `gpt-4.1-nano`).
 3. Grant **Accessibility** and **Input Monitoring** when prompted (or use the buttons in Settings).
 

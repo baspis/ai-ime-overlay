@@ -12,7 +12,7 @@ final class AppCoordinator: ObservableObject {
     private lazy var settingsWindowController = SettingsWindowController(appState: appState) { [weak self] in
         self?.refreshPermissionsAndHotkey()
     }
-    private let openAIClient = OpenAIClient()
+    private let geminiClient = GeminiClient()
 
     private var convertTask: Task<Void, Never>?
     private var activationObserver: NSObjectProtocol?
@@ -113,14 +113,14 @@ final class AppCoordinator: ObservableObject {
 
     func startConversion() {
         guard let apiKey = KeychainStore.readAPIKey() else {
-            panelController.model.failConverting(message: OpenAIClientError.missingAPIKey.localizedDescription)
+            panelController.model.failConverting(message: GeminiClientError.missingAPIKey.localizedDescription)
             openSettings()
             return
         }
 
         let romaji = panelController.model.romajiInput
         guard !romaji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            panelController.model.failConverting(message: OpenAIClientError.emptyInput.localizedDescription)
+            panelController.model.failConverting(message: GeminiClientError.emptyInput.localizedDescription)
             return
         }
 
@@ -130,7 +130,7 @@ final class AppCoordinator: ObservableObject {
         convertTask = Task { [weak self] in
             guard let self else { return }
             do {
-                let result = try await openAIClient.convertRomaji(
+                let result = try await geminiClient.convertRomaji(
                     romaji,
                     apiKey: apiKey,
                     model: AppSettings.modelName
@@ -190,7 +190,6 @@ final class AppCoordinator: ObservableObject {
 
 @MainActor
 final class AppState: ObservableObject {
-    @Published var showSettings = false
     @Published var hasAPIKey = false
     @Published var hasAccessibility = false
     @Published var hasInputMonitoring = false
