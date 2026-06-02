@@ -10,10 +10,6 @@ struct AIIMEOverlayApp: App {
             menuContent
         }
         .menuBarExtraStyle(.window)
-
-        Settings {
-            SettingsView(appState: coordinator.appState)
-        }
     }
 
     @ViewBuilder
@@ -47,7 +43,7 @@ struct AIIMEOverlayApp: App {
             .disabled(coordinator.appState.isPanelVisible)
 
             Button("Settings…") {
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                coordinator.openSettings()
             }
 
             Divider()
@@ -61,11 +57,6 @@ struct AIIMEOverlayApp: App {
         .padding(8)
         .onAppear {
             coordinator.start()
-        }
-        .onChange(of: coordinator.appState.showSettings) { _, show in
-            guard show else { return }
-            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-            coordinator.appState.showSettings = false
         }
     }
 }

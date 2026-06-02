@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var appState: AppState
+    var onRefresh: (() -> Void)?
 
     @State private var apiKeyDraft = ""
     @State private var modelDraft = AppSettings.modelName
@@ -20,12 +21,19 @@ struct SettingsView: View {
                 SecureField("API Key", text: $apiKeyDraft)
                     .textFieldStyle(.roundedBorder)
 
+                if appState.hasAPIKey {
+                    Text("A key is saved in Keychain. Enter a new key below to replace it.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
                 TextField("Model", text: $modelDraft)
                     .textFieldStyle(.roundedBorder)
 
                 HStack {
                     Button("Save") { saveSettings() }
                         .disabled(isSaving)
+                        .keyboardShortcut(.defaultAction)
                     if appState.hasAPIKey {
                         Button("Remove Key", role: .destructive) { removeAPIKey() }
                     }
@@ -41,19 +49,41 @@ struct SettingsView: View {
             Section("Permissions") {
                 permissionRow(
                     title: "Accessibility",
-                    granted: Permissions.hasAccessibility,
+                    granted: appState.hasAccessibility,
                     action: Permissions.openAccessibilitySettings
                 )
                 permissionRow(
                     title: "Input Monitoring",
-                    granted: Permissions.hasInputMonitoring,
+                    granted: appState.hasInputMonitoring,
                     action: Permissions.openInputMonitoringSettings
                 )
-                Button("Request Permissions") {
-                    Permissions.requestAccessibility(prompt: true)
-                    _ = Permissions.requestInputMonitoring()
-                    appState.refreshPermissionStatus()
+
+                Text("In System Settings, enable **AIIMEOverlay** (or the app at the path below).")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Text(Permissions.appPathForPrivacyList)
+                    .font(.caption2)
+                    .textSelection(.enabled)
+                    .foregroundStyle(.secondary)
+
+                HStack {
+                    Button("Open Accessibility Settings") {
+                        Permissions.openAccessibilitySettings()
+                    }
+                    Button("Open Input Monitoring Settings") {
+                        Permissions.openInputMonitoringSettings()
+                    }
                 }
+
+                Button("Refresh status") {
+                    onRefresh?()
+                    refreshDisplayedStatus()
+                }
+
+                Text("After granting permissions, click Refresh. If status stays off, quit AI IME from the menu bar and open the app again.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section("Usage") {
@@ -63,11 +93,11 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 440, height: 420)
+        .padding()
+        .frame(minWidth: 420, minHeight: 440)
         .onAppear {
-            apiKeyDraft = ""
             modelDraft = AppSettings.modelName
-            appState.refreshPermissionStatus()
+            refreshDisplayedStatus()
         }
     }
 
@@ -78,8 +108,14 @@ struct SettingsView: View {
             Spacer()
             Image(systemName: granted ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                 .foregroundStyle(granted ? .green : .orange)
-            Button("Open Settings") { action() }
+                .help(granted ? "Granted" : "Not granted")
+            Button("Open") { action() }
         }
+    }
+
+    private func refreshDisplayedStatus() {
+        appState.refreshPermissionStatus()
+        appState.refreshAPIKeyStatus()
     }
 
     private func saveSettings() {

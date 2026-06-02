@@ -17,6 +17,7 @@
 		A10000010000000000000008 /* ConversionPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000008 /* ConversionPanelController.swift */; };
 		A10000010000000000000009 /* ConversionPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000009 /* ConversionPanelView.swift */; };
 		A1000001000000000000000A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000A /* SettingsView.swift */; };
+		A1000001000000000000000E /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000011 /* SettingsWindowController.swift */; };
 		A1000001000000000000000B /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000B /* KeychainStore.swift */; };
 		A1000001000000000000000C /* OpenAIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000C /* OpenAIClient.swift */; };
 		A1000001000000000000000D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000D /* Assets.xcassets */; };
@@ -39,6 +40,7 @@
 		A2000001000000000000000E /* AIIMEOverlay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIIMEOverlay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2000001000000000000000F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000010000000000000010 /* AIIMEOverlay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AIIMEOverlay.entitlements; sourceTree = "<group>"; };
+		A20000010000000000000011 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 				A20000010000000000000008 /* ConversionPanelController.swift */,
 				A20000010000000000000009 /* ConversionPanelView.swift */,
 				A2000001000000000000000A /* SettingsView.swift */,
+				A20000010000000000000011 /* SettingsWindowController.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 				A10000010000000000000008 /* ConversionPanelController.swift in Sources */,
 				A10000010000000000000009 /* ConversionPanelView.swift in Sources */,
 				A1000001000000000000000A /* SettingsView.swift in Sources */,
+				A1000001000000000000000E /* SettingsWindowController.swift in Sources */,
 				A1000001000000000000000B /* KeychainStore.swift in Sources */,
 				A1000001000000000000000C /* OpenAIClient.swift in Sources */,
 			);

@@ -9,9 +9,13 @@ final class AppCoordinator: ObservableObject {
     private let focusStore = FocusStore()
     private let hotkeyMonitor = HotkeyMonitor()
     private let panelController = ConversionPanelController()
+    private lazy var settingsWindowController = SettingsWindowController(appState: appState) { [weak self] in
+        self?.refreshPermissionsAndHotkey()
+    }
     private let openAIClient = OpenAIClient()
 
     private var convertTask: Task<Void, Never>?
+    private var activationObserver: NSObjectProtocol?
 
     func start() {
         panelController.onConvert = { [weak self] in self?.startConversion() }
@@ -25,14 +29,16 @@ final class AppCoordinator: ObservableObject {
         appState.refreshAPIKeyStatus()
         appState.refreshPermissionStatus()
 
-        if !hotkeyMonitor.start() {
-            appState.hotkeyMonitorRunning = false
-            notify(
-                title: "AI IME",
-                body: "Could not start hotkey monitor. Grant Input Monitoring permission."
-            )
-        } else {
-            appState.hotkeyMonitorRunning = true
+        restartHotkeyMonitorIfNeeded()
+
+        activationObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.refreshPermissionsAndHotkey()
+            }
         }
     }
 
@@ -40,17 +46,50 @@ final class AppCoordinator: ObservableObject {
         convertTask?.cancel()
         hotkeyMonitor.stop()
         panelController.dismissPanel()
+        settingsWindowController.window?.orderOut(nil)
+        if let activationObserver {
+            NotificationCenter.default.removeObserver(activationObserver)
+            self.activationObserver = nil
+        }
+    }
+
+    func openSettings() {
+        refreshPermissionsAndHotkey()
+        settingsWindowController.present()
+    }
+
+    func refreshPermissionsAndHotkey() {
+        appState.refreshPermissionStatus()
+        appState.refreshAPIKeyStatus()
+        restartHotkeyMonitorIfNeeded()
+    }
+
+    private func restartHotkeyMonitorIfNeeded() {
+        guard Permissions.isReady else {
+            appState.hotkeyMonitorRunning = false
+            return
+        }
+
+        hotkeyMonitor.stop()
+        if hotkeyMonitor.start() {
+            appState.hotkeyMonitorRunning = true
+        } else {
+            appState.hotkeyMonitorRunning = false
+            notify(
+                title: "AI IME",
+                body: "Could not start hotkey monitor. Enable Input Monitoring for this app, then click Refresh in Settings."
+            )
+        }
     }
 
     func openPanel() {
         guard Permissions.isReady else {
             Permissions.requestAccessibility(prompt: true)
             _ = Permissions.requestInputMonitoring()
-            appState.refreshPermissionStatus()
-            appState.showSettings = true
+            openSettings()
             notify(
                 title: "AI IME",
-                body: "Grant Accessibility and Input Monitoring permissions in Settings."
+                body: "Enable AIIMEOverlay in Accessibility and Input Monitoring, then click Refresh in Settings."
             )
             return
         }
@@ -75,7 +114,7 @@ final class AppCoordinator: ObservableObject {
     func startConversion() {
         guard let apiKey = KeychainStore.readAPIKey() else {
             panelController.model.failConverting(message: OpenAIClientError.missingAPIKey.localizedDescription)
-            appState.showSettings = true
+            openSettings()
             return
         }
 
